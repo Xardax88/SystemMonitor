@@ -1,14 +1,46 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+==============================================================================
+System Monitor Widget
+---------------------
+Un widget flotante para Windows que muestra en tiempo real el uso de CPU, GPU, VRAM y RAM.
+Incluye fondo acrílico/translúcido, siempre visible y control desde la bandeja del sistema.
+
+Autor: Neodoomed
+Requisitos:
+    - Python 3.8+
+    - PyQt6
+    - psutil
+    - GPUtil
+    - pywin32
+
+Licencia: MIT
+
+==============================================================================
+"""
+
 import sys
 import psutil
 import GPUtil
-from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QHBoxLayout, QSystemTrayIcon, QMenu, QGraphicsEffect)
-from PyQt6.QtGui import QIcon, QPainter, QColor
+from PyQt6.QtWidgets import (
+    QApplication,
+    QWidget,
+    QLabel,
+    QHBoxLayout,
+    QSystemTrayIcon,
+    QMenu,
+)
+from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt, QTimer
 
 import win32con
 import win32gui
 
 
+# -----------------------------------------------------------------------
+# Clase para el monitor del sistema
+# -----------------------------------------------------------------------
 class SystemMonitor(QWidget):
     def __init__(self):
         super().__init__()
@@ -41,6 +73,7 @@ class SystemMonitor(QWidget):
         self.is_locked = not self.is_locked
         return self.is_locked
 
+    # Función para inicializar la interfaz de usuario
     def initUI(self):
         self.cpu_label = QLabel("CPU: 0%")
         self.gpu_label = QLabel("GPU: 0%")
@@ -60,14 +93,15 @@ class SystemMonitor(QWidget):
 
         self.setLayout(hbox)
         self.setWindowFlags(
-            Qt.WindowType.Popup |
-            Qt.WindowType.FramelessWindowHint |
-            Qt.WindowType.WindowStaysOnTopHint |
-            Qt.WindowType.Tool
+            Qt.WindowType.Popup
+            | Qt.WindowType.FramelessWindowHint
+            | Qt.WindowType.WindowStaysOnTopHint
+            | Qt.WindowType.Tool
         )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
                 QWidget {
                     background-color: rgba(0, 0, 0, 100);
                     padding: 8px;
@@ -75,33 +109,41 @@ class SystemMonitor(QWidget):
                     padding-right: 10px;
                     border-radius: 10px;
                 }
-            """)
+            """
+        )
 
         self.setGeometry(10, 1035, 400, 30)
-        self.setWindowTitle('System Monitor')
+        self.setWindowTitle("System Monitor")
         self.show()
         self.set_always_on_top()
 
+    # Función para establecer la ventana siempre en la parte superior
     def set_always_on_top(self):
         hwnd = int(self.winId())
         win32gui.SetWindowPos(
             hwnd,
             win32con.HWND_TOPMOST,
-            0, 0, 0, 0,
-            win32con.SWP_NOMOVE | win32con.SWP_NOSIZE
+            0,
+            0,
+            0,
+            0,
+            win32con.SWP_NOMOVE | win32con.SWP_NOSIZE,
         )
 
+    # Función para manejar el evento de mostrar la ventana
     def showEvent(self, event):
         super().showEvent(event)
         self.raise_()
         self.activateWindow()
         self.set_always_on_top()
 
+    # Función para manejar el evento de ocultar la ventana
     def focusInEvent(self, event):
         # Manejar el evento de foco para asegurar que la ventana permanezca activa
         self.setWindowState(self.windowState() | Qt.WindowActive)
         super().focusInEvent(event)
 
+    # Función para actualizar las estadísticas del sistema
     def update_stats(self):
         cpu_percent = psutil.cpu_percent()
         ram_percent = psutil.virtual_memory().percent
@@ -125,11 +167,13 @@ class SystemMonitor(QWidget):
         self.vram_label.setText("VRAM: {0:.1f}%".format(vram_percent))
         self.ram_label.setText("RAM: {0:.1f}%".format(ram_percent))
 
+    # Función para manejar el evento de perder el foco
     def focusOutEvent(self, event):
         self.setWindowState(self.windowState() | Qt.WindowActive)
         super().focusOutEvent(event)
         self.raise_()
 
+    # Función para asegurar que la ventana esté siempre en la parte superior
     def ensure_on_top(self):
         hwnd = int(self.winId())
         fg_hwnd = win32gui.GetForegroundWindow()
@@ -138,6 +182,9 @@ class SystemMonitor(QWidget):
             self.activateWindow()
 
 
+# -----------------------------------------------------------------------
+# Clase para el icono de la bandeja del sistema
+# -----------------------------------------------------------------------
 class TrayIcon(QSystemTrayIcon):
     def __init__(self, icon, parent=None):
         super().__init__()
@@ -158,6 +205,7 @@ class TrayIcon(QSystemTrayIcon):
         self.activated.connect(self.on_tray_icon_activated)
         self.show()
 
+    # Función para alternar la visibilidad de la ventana del monitor
     def toggle_window(self):
         if self.monitor.isVisible():
             self.monitor.hide()
@@ -166,25 +214,32 @@ class TrayIcon(QSystemTrayIcon):
             self.monitor.raise_()
             self.monitor.activateWindow()
 
+    # Función para alternar el bloqueo de la posición del monitor
     def toggle_lock(self):
         is_locked = self.monitor.toggle_lock()
-        self.lock_action.setText("Desbloquear posición" if is_locked else "Bloquear posición")
+        self.lock_action.setText(
+            "Desbloquear posición" if is_locked else "Bloquear posición"
+        )
 
+    # Función para manejar el evento de activación del icono de la bandeja
     def on_tray_icon_activated(self, reason):
         if reason == QSystemTrayIcon.ActivationReason.Trigger:
             self.toggle_window()
 
+    # Función para salir de la aplicación
     def exit_app(self):
         self.monitor.hide()
         QApplication.quit()
 
 
-
-if __name__ == '__main__':
+# -----------------------------------------------------------------------
+# Función principal
+# -----------------------------------------------------------------------
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)  # Prevent closing when the window is closed
 
-    icon = QIcon("icon.png")  # Reemplaza con la ruta a tu icono
+    icon = QIcon("icon.png")
     tray_icon = TrayIcon(icon)
 
     sys.exit(app.exec())
