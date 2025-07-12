@@ -1,0 +1,38 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+env/
+venv/
+.venv/
+
+# Archivos de configuración de PyCharm
+.idea/
+*.iml
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de log y temporales
+*.log
+*.tmp
+
+# Archivos de Python
+*.pyo
+
+# Archivos de test coverage
+htmlcov/
+.coverage
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+
+# Archivos de distribución
+dist/
+build/
+*.egg-info/
