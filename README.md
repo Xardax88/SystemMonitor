@@ -3,7 +3,7 @@
 ![Último Commit](https://img.shields.io/github/last-commit/Xardax88/SystemMonitor)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/mit/)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![PyQt6](https://img.shields.io/badge/PyQt6-8.0.0-blue.svg)](https://pypi.org/project/PyQt6/)
+[![PyQt6](https://img.shields.io/badge/PyQt6-6.9.1-blue.svg)](https://pypi.org/project/PyQt6/)
 [![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-000000.svg)](https://github.com/psf/black)
 
 Un widget flotante para Windows que muestra el uso de CPU, GPU, VRAM y RAM en tiempo real, siempre visible y con fondo translúcido/acrílico.

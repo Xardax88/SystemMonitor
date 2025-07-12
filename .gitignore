@@ -35,4 +35,6 @@ htmlcov/
 # Archivos de distribución
 dist/
 build/
+output/
 *.egg-info/
+*.spec

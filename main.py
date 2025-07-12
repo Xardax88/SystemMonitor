@@ -30,6 +30,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QSystemTrayIcon,
     QMenu,
+    QMessageBox,
 )
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt, QTimer
@@ -114,28 +115,14 @@ class SystemMonitor(QWidget):
 
         self.setGeometry(10, 1035, 400, 30)
         self.setWindowTitle("System Monitor")
+        self.setWindowIcon(QIcon("icon.png"))
         self.show()
-        self.set_always_on_top()
-
-    # Función para establecer la ventana siempre en la parte superior
-    def set_always_on_top(self):
-        hwnd = int(self.winId())
-        win32gui.SetWindowPos(
-            hwnd,
-            win32con.HWND_TOPMOST,
-            0,
-            0,
-            0,
-            0,
-            win32con.SWP_NOMOVE | win32con.SWP_NOSIZE,
-        )
 
     # Función para manejar el evento de mostrar la ventana
     def showEvent(self, event):
         super().showEvent(event)
         self.raise_()
         self.activateWindow()
-        self.set_always_on_top()
 
     # Función para manejar el evento de ocultar la ventana
     def focusInEvent(self, event):
@@ -198,6 +185,9 @@ class TrayIcon(QSystemTrayIcon):
         self.lock_action = self.menu.addAction("Bloquear posición")
         self.lock_action.triggered.connect(self.toggle_lock)
 
+        about_action = self.menu.addAction("Acerca de")
+        about_action.triggered.connect(self.show_about)
+
         exit_action = self.menu.addAction("Salir")
         exit_action.triggered.connect(self.exit_app)
 
@@ -225,6 +215,23 @@ class TrayIcon(QSystemTrayIcon):
     def on_tray_icon_activated(self, reason):
         if reason == QSystemTrayIcon.ActivationReason.Trigger:
             self.toggle_window()
+
+    # Función para mostrar información sobre la aplicación
+    def show_about(self):
+        about_box = QMessageBox()
+        about_box.setWindowTitle("Acerca de System Monitor Widget")
+        about_box.setWindowIcon(QIcon("icon.png"))
+        about_box.setTextFormat(Qt.TextFormat.RichText)
+        about_box.setText(
+            "<b>System Monitor Widget</b><br>"
+            "Autor: <a href='https://github.com/Xardax88'>Xardax</a><br>"
+            "Muestra uso de <b>CPU</b>, <b>GPU</b>, <b>VRAM</b> y <b>RAM</b> en tiempo real.<br>"
+            "Licencia: MIT<br>"
+            "GitHub: <a href='https://github.com/Xardax88/SystemMonitor'>https://github.com/Xardax88/SystemMonitor</a>"
+        )
+        about_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        about_box.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
+        about_box.exec()
 
     # Función para salir de la aplicación
     def exit_app(self):
