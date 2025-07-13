@@ -22,8 +22,9 @@ Licencia: MIT
 """
 
 import sys
-import psutil
-import GPUtil
+import time
+import threading
+
 from PyQt6.QtWidgets import (
     QApplication,
     QWidget,
@@ -36,7 +37,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt, QTimer
 
-import win32gui
+import psutil
+import GPUtil
 
 
 # -----------------------------------------------------------------------
@@ -46,17 +48,26 @@ class SystemMonitor(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_stats)
-        self.timer.start(1000)  # Actualiza cada segundo
+
         self.is_locked = False  # Controlar si está bloqueada
         self.dragging = False
         self.offset = None
 
         self.check_timer = QTimer()
         self.check_timer.timeout.connect(self.ensure_on_top)
-        self.check_timer.start(500)  # Verifica cada 0.5 segundo
+        self.check_timer.start(1000)
 
+        # Inicia los hilos para actualizar las estadísticas
+        self.cpu_thread = threading.Thread(
+            target=self.update_cpu_stats_background, daemon=True
+        )
+        self.gpu_thread = threading.Thread(
+            target=self.update_gpu_stats_background, daemon=True
+        )
+        self.cpu_thread.start()
+        self.gpu_thread.start()
+
+    # Funciones para manejar el arrastre de la ventana
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton and not self.is_locked:
             self.dragging = True
@@ -113,7 +124,7 @@ class SystemMonitor(QWidget):
             """
         )
 
-        self.setGeometry(10, 1035, 400, 30)
+        self.setGeometry(15, 1037, 400, 30)
         self.setWindowTitle("System Monitor")
         self.setWindowIcon(QIcon("icon.png"))
         self.show()
@@ -130,29 +141,45 @@ class SystemMonitor(QWidget):
         self.setWindowState(self.windowState() | Qt.WindowActive)
         super().focusInEvent(event)
 
-    # Función para actualizar las estadísticas del sistema
-    def update_stats(self):
-        cpu_percent = psutil.cpu_percent()
-        ram_percent = psutil.virtual_memory().percent
-
+    # Función para obtener las estadísticas de la GPU (ejecutada en el hilo)
+    def get_gpu_stats(self):
         try:
             gpus = GPUtil.getGPUs()
             if gpus:
                 gpu = gpus[0]
-                gpu_percent = gpu.load * 100
-                vram_percent = gpu.memoryUsed / gpu.memoryTotal * 100
+                return (gpu.load * 100, gpu.memoryUtil * 100)
             else:
-                gpu_percent = 0
-                vram_percent = 0
-        except Exception as e:
-            print(f"Error al obtener información de la GPU: {e}")
-            gpu_percent = 0
-            vram_percent = 0
+                return (0, 0)
+        except Exception:
+            return (0, 0)
 
+    # Función para actualizar las estadísticas de la CPU (ejecutada en el hilo)
+    def update_cpu_stats_background(self):
+        while True:
+            cpu_percent = psutil.cpu_percent()
+            ram_percent = psutil.virtual_memory().percent
+
+            # Llama a la función para actualizar las labels desde el hilo principal
+            self.update_cpu_labels(cpu_percent, ram_percent)
+            time.sleep(1)
+
+    # Función para actualizar las estadísticas de la GPU (ejecutada en el hilo)
+    def update_gpu_stats_background(self):
+        while True:
+            gpu_percent, vram_percent = self.get_gpu_stats()
+
+            # Llama a la función para actualizar las labels desde el hilo principal
+            self.update_gpu_labels(gpu_percent, vram_percent)
+            time.sleep(1)
+
+    # Función para actualizar las etiquetas de uso
+    def update_cpu_labels(self, cpu_percent, ram_percent):
         self.cpu_label.setText("CPU: {0:.1f}%".format(cpu_percent))
+        self.ram_label.setText("RAM: {0:.1f}%".format(ram_percent))
+
+    def update_gpu_labels(self, gpu_percent, vram_percent):
         self.gpu_label.setText("GPU: {0:.1f}%".format(gpu_percent))
         self.vram_label.setText("VRAM: {0:.1f}%".format(vram_percent))
-        self.ram_label.setText("RAM: {0:.1f}%".format(ram_percent))
 
     # Función para manejar el evento de perder el foco
     def focusOutEvent(self, event):
@@ -162,22 +189,19 @@ class SystemMonitor(QWidget):
 
     # Función para asegurar que la ventana esté siempre en la parte superior
     def ensure_on_top(self):
-        hwnd = int(self.winId())
-        fg_hwnd = win32gui.GetForegroundWindow()
-        if hwnd != fg_hwnd:
-            self.raise_()
-            self.activateWindow()
+        self.raise_()
+        self.activateWindow()
 
 
 # -----------------------------------------------------------------------
 # Clase para el icono de la bandeja del sistema
 # -----------------------------------------------------------------------
 class TrayIcon(QSystemTrayIcon):
-    def __init__(self, icon, parent=None):
+    def __init__(self, icon, monitor, parent=None):
         super().__init__()
         QSystemTrayIcon.__init__(self, icon, parent)
         self.menu = QMenu(parent)
-        self.monitor = SystemMonitor()
+        self.monitor = monitor
 
         toggle_window_action = self.menu.addAction("Mostrar/Ocultar")
         toggle_window_action.triggered.connect(self.toggle_window)
@@ -247,6 +271,7 @@ if __name__ == "__main__":
     app.setQuitOnLastWindowClosed(False)  # Prevent closing when the window is closed
 
     icon = QIcon("icon.png")
-    tray_icon = TrayIcon(icon)
+    monitor = SystemMonitor()
+    tray_icon = TrayIcon(icon, monitor)
 
     sys.exit(app.exec())
