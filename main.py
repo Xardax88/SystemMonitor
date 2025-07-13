@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
+
 System Monitor Widget
 ---------------------
 Un widget flotante para Windows que muestra en tiempo real el uso de CPU, GPU, VRAM y RAM.
 Incluye fondo acrílico/translúcido, siempre visible y control desde la bandeja del sistema.
 
-Autor: Neodoomed
+Autor: Xardax * Paragoni Maximiliano
 Requisitos:
     - Python 3.8+
     - PyQt6
