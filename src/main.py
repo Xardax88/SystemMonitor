@@ -126,7 +126,7 @@ class SystemMonitor(QWidget):
 
         self.setGeometry(15, 1037, 400, 30)
         self.setWindowTitle("System Monitor")
-        self.setWindowIcon(QIcon("icon.png"))
+        self.setWindowIcon(QIcon("../assets/icon.png"))
         self.show()
 
     # Función para manejar el evento de mostrar la ventana
@@ -244,7 +244,7 @@ class TrayIcon(QSystemTrayIcon):
     def show_about(self):
         about_box = QMessageBox()
         about_box.setWindowTitle("Acerca de System Monitor Widget")
-        about_box.setWindowIcon(QIcon("icon.png"))
+        about_box.setWindowIcon(QIcon("../assets/icon.png"))
         about_box.setTextFormat(Qt.TextFormat.RichText)
         about_box.setText(
             "<b>System Monitor Widget</b><br>"
@@ -270,7 +270,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)  # Prevent closing when the window is closed
 
-    icon = QIcon("icon.png")
+    icon = QIcon("../assets/icon.png")
     monitor = SystemMonitor()
     tray_icon = TrayIcon(icon, monitor)
 
