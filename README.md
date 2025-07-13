@@ -5,12 +5,13 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/mit/)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![PyQt6](https://img.shields.io/badge/PyQt6-6.9.1-blue.svg)](https://pypi.org/project/PyQt6/)
+[![PyInstaller](https://img.shields.io/badge/PyInstaller-6.14.2-blue.svg)](https://www.pyinstaller.org/)
 [![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-000000.svg)](https://github.com/psf/black)
 
 Un widget flotante para Windows programado en Python, que muestra el uso de CPU, GPU, VRAM y RAM en tiempo real, siempre visible y con fondo translúcido/acrílico.
 
 > [!IMPORTANT]  
-> Actualmente la aplicación solo funciona con placas de video NVIDIA, ya que utiliza la librería GPUtil para obtener información de la GPU.
+> Actualmente la aplicación solo funciona con placas de video NVIDIA, ya que utiliza la librería **gpustat** para obtener información de la GPU.
 ---
 
 ## Características
@@ -28,7 +29,7 @@ Un widget flotante para Windows programado en Python, que muestra el uso de CPU,
 - Python 3.8+
 - PyQt6
 - psutil
-- GPUtil
+- gpustat
 
 ## Instalación
 
@@ -99,7 +100,8 @@ El widget aparecerá en la esquina inferior izquierda. Usa el icono de la bandej
 
 - El widget intenta estar siempre visible sobre la barra de tareas.
 - El fondo translúcido/acrílico solo funciona en Windows 10/11.
-- **Limitaciones**: Actualmente solo funciona con tarjetas NVIDIA.
+- **Limitaciones**: Actualmente, solo funciona con tarjetas NVIDIA.
+- Ejecutable realizado con [PyInstaller](https://www.pyinstaller.org/) para facilitar la distribución.
 
 ---
 
@@ -108,5 +110,5 @@ Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo [LICENS
 
 ## Autor
 
-Paragoni Maximiliano (Xardax88)
+Paragoni Maximiliano ([Xardax88](https://github.com/Xardax88))
     
