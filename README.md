@@ -1,5 +1,6 @@
 # System Monitor Widget Py 🐍
 
+[![Última Versión](https://img.shields.io/github/v/release/Xardax88/SystemMonitor?include_prereleases&label=version&color=blue)](https://github.com/Xardax88/SystemMonitor/releases)
 ![Último Commit](https://img.shields.io/github/last-commit/Xardax88/SystemMonitor)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/mit/)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
@@ -54,6 +55,7 @@ Un widget flotante para Windows programado en Python, que muestra el uso de CPU,
 
         *   En algunos sistemas, puede que necesite usar `python3` en lugar de `python`.
 
+
 3.  **Activar el entorno virtual:**
 
     Debe activar el entorno virtual para que Python utilice las dependencias instaladas dentro de él.
@@ -64,11 +66,6 @@ Un widget flotante para Windows programado en Python, que muestra el uso de CPU,
         .venv\Scripts\activate
         ```
 
-    *   **macOS y Linux:**
-
-        ```bash
-        source .venv/bin/activate
-        ```
 
 4.  **Instalar las dependencias:**
 
@@ -90,12 +87,6 @@ Un widget flotante para Windows programado en Python, que muestra el uso de CPU,
 
 Ejecuta el script principal:
 
-*   **macOS y Linux:**
-    ```bash
-      source .venv/bin/activate
-      python main.py
-    ```
-    
 *   **Windows:**
     ```bash
       .venv\Scripts\activate
