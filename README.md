@@ -1,4 +1,4 @@
-# System Monitor Widget Py 🐍
+# System PyMonitor 🐍
 
 [![Última Versión](https://img.shields.io/github/v/release/Xardax88/SystemMonitor?include_prereleases&label=version&color=blue)](https://github.com/Xardax88/SystemMonitor/releases)
 ![Último Commit](https://img.shields.io/github/last-commit/Xardax88/SystemMonitor)
